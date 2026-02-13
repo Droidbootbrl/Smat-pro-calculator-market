@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2ecc71">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Contrato Completo</title>
+    <style>
+        :root { --blue: #003366; --gold: #ccdf00; --success: #2ecc71; --error: #e74c3c; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        #quiz-container { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+        h1 { color: var(--blue); font-size: 1.6rem; margin-bottom: 10px; }
+        .topic-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid var(--blue); border-radius: 12px; background: white; color: var(--blue); font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .topic-btn:hover { background: var(--blue); color: white; }
+        .btn-simulado { background: var(--gold); border-color: var(--gold); color: var(--blue); }
+        .option-btn { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; background: white; text-align: left; cursor: pointer; font-size: 0.95rem; }
+        .option-btn:hover:not(:disabled) { border-color: var(--blue); background: #f8faff; }
+        .correct { background: var(--success) !important; color: white; border-color: var(--success); }
+        .wrong { background: var(--error) !important; color: white; border-color: var(--error); }
+        #explanation { background: #fff3f3; padding: 15px; border-left: 5px solid var(--error); margin: 15px 0; display: none; text-align: left; font-size: 0.9rem; border-radius: 8px; }
+        #next-btn { width: 100%; padding: 15px; background: var(--blue); color: white; border: none; border-radius: 10px; margin-top: 10px; display: none; cursor: pointer; font-weight: bold; }
+        #quiz-area, #result { display: none; }
+        .progress-bar { background: #eee; height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+        #progress-fill { background: var(--blue); height: 100%; width: 0%; transition: 0.4s; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+                    <div id="menu">
+    <h1 style="color: #2ecc71;">Quiz PagBank</h1>
+    
+    <button class="topic-btn" onclick="toggleSubtopicos()" style="background-color: #27ae60; font-weight: bold; margin-bottom: 10px;">
+        📂 Contrato Cartão PagBank (Ver Tópicos)
+    </button>
+
+    <div id="subtopicos" style="display: none; background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px;">
+        <button class="topic-btn" onclick="iniciarQuiz('Pagamentos e Fatura')">Pagamentos e Fatura</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Uso do Cartão')">Uso do Cartão</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Utilização do Cartão')">Utilização do Cartão</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Limite de Crédito')">Limite de Crédito</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Limite com Uso do Saldo')">Limite c/ Saldo (Caução)</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Compras e Saques Internacionais')">Compras Internacionais</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Realização de Saques')">Realização de Saques</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Regras e Taxas')">Regras e Taxas</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Conta e Segurança')">Conta e Segurança</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Sobre o Contrato')">Sobre o Contrato</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Opções de Pagamento e Crédito')">Pagamento e Crédito</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Atraso e Inadimplência')">Atraso e Inadimplência</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Mandato e Financiamento')">Mandato e Financiamento</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Segurança e Extravio')">Segurança e Extravio</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Cancelamento e Bloqueio')">Cancelamento e Bloqueio</button>
+        <button class="topic-btn" onclick="iniciarQuiz('Disposições Gerais e Canais')">Disposições Gerais e Canais</button>
+    </div>
+
+    <button class="topic-btn btn-simulado" onclick="iniciarQuiz('Tudo')">🚀 Simulado Completo (157 Questões)</button>
+</div>
+
+<div id="quiz-container" style="display: none;">
+    <div id="pergunta"></div>
+    <div id="opcoes"></div>
+    <button class="topic-btn" onclick="voltarAoMenu()" style="background-color: #95a5a6; margin-top: 20px;">⬅ Voltar ao Menu Inicial</button>
+</div>
+    <div id="quiz-area">
+        <div id="topic-label" style="background:var(--gold); display:inline-block; padding:3px 10px; border-radius:15px; font-size:0.7rem; font-weight:bold; text-transform:uppercase;"></div>
+        <div id="status" style="font-size:0.85rem; color:#666; margin: 10px 0;"></div>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        <div id="question" style="font-weight:bold; color:var(--blue); font-size:1.1rem; margin:20px 0; text-align:left; line-height:1.4;"></div>
+        <div id="options"></div>
+        <div id="explanation"></div>
+        <button id="next-btn" onclick="proximaPergunta()">Próxima Pergunta</button>
+    </div>
+
+    <div id="result">
+        <h2 style="color:var(--blue)">Desempenho Final</h2>
+        <div id="score-circle" style="font-size:4rem; font-weight:bold; color:var(--blue); margin:20px 0;"></div>
+        <p id="summary" style="margin-bottom:25px; color:#555;"></p>
+        <button class="topic-btn" onclick="location.reload()">Escolher Outro Tópico</button>
+    </div>
+</div>
+
+<script>
+  // Função para abrir e fechar os subtópicos
+function toggleSubtopicos() {
+    const sub = document.getElementById('subtopicos');
+    if (sub.style.display === "none") {
+        sub.style.display = "block";
+    } else {
+        sub.style.display = "none";
+    }
+}
+
+// Função para abandonar o quiz e voltar ao menu
+function voltarAoMenu() {
+    if (confirm("Deseja mesmo parar o quiz e voltar ao menu?")) {
+        document.getElementById('quiz-container').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+        // Opcional: esconder o resultado se estiver visível
+        if(document.getElementById('resultado')) {
+            document.getElementById('resultado').style.display = 'none';
+        }
+    }
+}
+    const bancoDeDados = [
+        // PAGAMENTOS E FATURA (5)
+        { t: "Pagamentos e Fatura", q: "O que ocorre com o saldo devedor ao fazer o PAGAMENTO MÍNIMO?", o: ["É perdoado", "Torna-se Crédito Rotativo (empréstimo)", "Dobra o limite", "Gera bônus"], c: 1, why: "O saldo vira um empréstimo pessoal de curto prazo cobrado no mês seguinte." },
+        { t: "Pagamentos e Fatura", q: "O que significa CET na fatura?", o: ["Código de Entrega", "Custo Efetivo Total", "Cartão Temporário", "Consumo Total"], c: 1, why: "Representa o custo real da operação (taxas, impostos e encargos)." },
+        { t: "Pagamentos e Fatura", q: "Para que serve o PAGAMENTO MÍNIMO?", o: ["Taxa anual", "Evitar atraso, multa e bloqueio", "Quitar tudo", "Aumentar limite"], c: 1, why: "Serve para manter a conta em dia e evitar penalidades por inadimplência." },
+        { t: "Pagamentos e Fatura", q: "Onde o PagSeguro disponibiliza a FATURA mensalmente?", o: ["Correio", "Canais digitais do PagSeguro", "Jornal", "Telefone"], c: 1, why: "Disponibilizada mensalmente de forma eletrônica nos canais digitais." },
+        { t: "Pagamentos e Fatura", q: "O que é PARCELAMENTO segundo o contrato?", o: ["Compra na loja", "Operação para quitar saldos em aberto da fatura", "Compra em 24x", "Pagar luz"], c: 1, why: "É a operação de crédito para pagar saldos em aberto." },
+
+        // USO DO CARTÃO (5)
+        { t: "Uso do Cartão", q: "O que caracteriza uma 'COMPRA' segundo as definições?", o: ["Só internet", "Aquisição de bens/serviços nos estabelecimentos", "PIX", "Impostos"], c: 1, why: "É a aquisição de produtos ou serviços usando o cartão." },
+        { t: "Uso do Cartão", q: "O que é a operação de SAQUE?", o: ["Boleto", "Retirada de espécie em terminais credenciados", "PIX", "Depósito"], c: 1, why: "É retirar dinheiro físico em caixas eletrônicos credenciados." },
+        { t: "Uso do Cartão", q: "Qual a BANDEIRA do cartão especificada no contrato?", o: ["Mastercard", "Visa", "Elo", "Amex"], c: 1, why: "O contrato define claramente que a bandeira utilizada é a Visa." },
+        { t: "Uso do Cartão", q: "O PagSeguro pode oferecer limites diferentes para quais operações?", o: ["Luz e Água", "COMPRAS e SAQUES", "Nacional e Global", "PF e PJ"], c: 1, why: "Pode haver limites distintos para compras e para saques." },
+        { t: "Uso do Cartão", q: "O LIMITE DE CRÉDITO é igual para todos os clientes?", o: ["Sim", "Não, depende de análise de crédito e perfil", "Governo decide", "Muda todo dia"], c: 1, why: "O valor depende da análise de crédito interna conforme políticas." },
+
+        // UTILIZAÇÃO DO CARTÃO (10)
+        { t: "Utilização do Cartão", q: "Quando ocorre o REESTABELECIMENTO do seu limite de crédito?", o: ["No primeiro dia do mês", "Conforme o pagamento da fatura e parcelas é realizado", "Após um ano", "No desbloqueio"], c: 1, why: "O limite é liberado à medida que o pagamento da fatura ocorre." },
+        { t: "Utilização do Cartão", q: "Quais atos caracterizam a CONCORDÂNCIA com uma transação?", o: ["Só assinatura", "Senha, assinatura ou canais digitais/telefone", "Receber o item", "Abrir o app"], c: 1, why: "Senha ou confirmação digital provam sua concordância com a transação." },
+        { t: "Utilização do Cartão", q: "O que você deve obter ao cancelar uma compra presencialmente?", o: ["Novo cartão", "Comprovante de cancelamento junto à loja", "Desconto", "Foto do lojista"], c: 1, why: "Deve-se obter o comprovante no ato junto ao estabelecimento." },
+        { t: "Utilização do Cartão", q: "Qual o prazo para o DIREITO DE ARREPENDIMENTO (compras online)?", o: ["24h", "7 (sete) dias", "30 dias", "Não existe"], c: 1, why: "Prazo legal de 7 dias para compras fora da loja física (CDC)." },
+        { t: "Utilização do Cartão", q: "De quem é a responsabilidade pela QUALIDADE ou defeitos dos produtos?", o: ["PagSeguro", "Exclusivamente do Estabelecimento", "Bandeira Visa", "Logística"], c: 1, why: "O PagSeguro não responde por vícios ou qualidade dos bens adquiridos." },
+        { t: "Utilização do Cartão", q: "O que acontece se o cartão for usado em JOGOS DE AZAR ilegais?", o: ["Bônus", "Cancelamento imediato do cartão e contrato", "Aviso por e-mail", "Nada"], c: 1, why: "O uso indevido para fins ilegais gera rescisão imediata do contrato." },
+        { t: "Utilização do Cartão", q: "Quem deve comunicar o PagSeguro sobre um cancelamento de compra?", o: ["O cliente", "O Estabelecimento", "A Bandeira", "O Banco Central"], c: 1, why: "O lojista deve comunicar o PagSeguro para que o estorno ocorra." },
+        { t: "Utilização do Cartão", q: "O PagSeguro é responsável se a loja recusar o cartão?", o: ["Sim", "Não responde por restrições dos estabelecimentos", "Sim, se tiver saldo", "Só se for Visa"], c: 1, why: "O PagSeguro não controla as políticas de aceitação de cada loja." },
+        { t: "Utilização do Cartão", q: "O cartão pode ser utilizado onde?", o: ["Só Brasil", "Só Exterior", "Brasil e/ou Exterior", "Lojas UOL"], c: 2, why: "O cartão pode ser usado em território nacional e estrangeiro." },
+        { t: "Utilização do Cartão", q: "Como são formalizadas as compras?", o: ["Só por voz", "Assinatura, senha ou confirmação digital", "Só no papel", "Pelo correio"], c: 1, why: "Esses métodos garantem a segurança e concordância da operação." },
+
+        // REGRAS E TAXAS (5)
+        { t: "Regras e Taxas", q: "Sobre qual valor incidem os ENCARGOS DE FINANCIAMENTO?", o: ["Valor total pago", "Parcela vencida ou saldo não liquidado", "Limite total", "Anuidade"], c: 1, why: "Incidem sobre a dívida não paga em razão de atraso." },
+        { t: "Regras e Taxas", q: "O que compõe os encargos de atraso?", o: ["Só anuidade", "Juros remuneratórios, multa e mora", "Taxa de app", "Fidelidade"], c: 1, why: "Inclui juros por dia de atraso, multa e juros de mora." },
+        { t: "Regras e Taxas", q: "Como o contrato define um 'DIA ÚTIL'?", o: ["Segunda a domingo", "Dias sem feriados federais ou bancários", "Apenas segunda", "Sábados"], c: 1, why: "São os dias que não são feriados segundo a Febraban." },
+        { t: "Regras e Taxas", q: "A adesão ao contrato ocorre em qual momento?", o: ["Assinatura", "Solicitação do desbloqueio do cartão", "Recebimento", "Cadastro"], c: 1, why: "A aceitação dos termos ocorre ao pedir o desbloqueio." },
+        { t: "Regras e Taxas", q: "Qual a idade mínima para ser responsável pelo cartão?", o: ["16 anos", "18 anos", "21 anos", "14 anos"], c: 1, why: "O cliente deve ser maior de 18 anos conforme o contrato." },
+
+        // CONTA E SEGURANÇA (5)
+        { t: "Conta e Segurança", q: "O que é o LIMITE COM USO DE SALDO DA CONTA?", o: ["Pagar boleto", "Aumento garantido por saldo em conta caução", "Empréstimo", "PIX"], c: 1, why: "É o aumento de limite baseado no saldo reservado na conta." },
+        { t: "Conta e Segurança", q: "Qual a função da conta CAUÇÃO?", o: ["Rendimento", "Garantir o cumprimento das obrigações do contrato", "Viagens", "Salário"], c: 1, why: "Garante o pagamento de dívidas principais e acessórias." },
+        { t: "Conta e Segurança", q: "O que é a CONTA PAGSEGURO?", o: ["Conta bancária comum", "Conta de pagamento pré-paga eletrônica", "Investimento", "Seguro"], c: 1, why: "Destinada a movimentar saldos de moedas eletrônicas." },
+        { t: "Conta e Segurança", q: "Quem é o SÓCIO GARANTIDOR (Pessoa Jurídica)?", o: ["O PagSeguro", "Sócio que assume responsabilidade integral e solidária", "Funcionário", "Bandeira"], c: 1, why: "Sócio que responde legalmente pelas obrigações da empresa." },
+        { t: "Conta e Segurança", q: "Caso haja dúvida, qual cláusula fala do atendimento?", o: ["1", "12", "50", "100"], c: 1, why: "As informações de suporte estão na Cláusula 12." },
+
+        // EXTRAS / SOBRE O CONTRATO (5)
+        { t: "Sobre o Contrato", q: "Como o contrato define o termo 'APP'?", o: ["Site", "Aplicativo para gerenciar conta e cartão", "Chat", "Telefone"], c: 1, why: "É o aplicativo oficial para funcionalidades da conta." },
+        { t: "Sobre o Contrato", q: "O que são 'ESTABELECIMENTOS'?", o: ["Só lojas físicas", "Lojas que aceitam o cartão no Brasil/Exterior", "Bancos", "Sedes do PagSeguro"], c: 1, why: "Qualquer fornecedor habilitado a aceitar a bandeira do cartão." },
+        { t: "Sobre o Contrato", q: "O que ocorre se houver uso indevido (ilegal)?", o: ["Multa leve", "Rescisão imediata e não reconhecimento da transação", "Aviso", "Nada"], c: 1, why: "O PagSeguro corta o vínculo imediatamente por segurança." },
+        { t: "Sobre o Contrato", q: "Onde constam os tributos e taxas totais?", o: ["No contrato social", "No CET (Custo Efetivo Total) na fatura", "No Google", "No verso do cartão"], c: 1, why: "O CET detalha todos os custos da operação financeira." },
+        { t: "Sobre o Contrato", q: "A quem direcionar reclamações de produtos?", o: ["PagSeguro", "Diretamente ao Estabelecimento", "Bandeira", "Procon apenas"], c: 1, why: "O PagSeguro é o meio de pagamento, não o vendedor do bem." },
+                // TÓPICO: REALIZAÇÃO DE SAQUES (5)
+        { t: "Realização de Saques", q: "Como é efetivada a realização de um SAQUE no cartão?", o: ["Como uma doação", "Através de uma contratação de financiamento", "Como um depósito simples", "Apenas como bônus"], c: 1, why: "O saque é considerado uma operação de financiamento junto à instituição financeira conveniada." },
+        { t: "Realização de Saques", q: "O que incide sobre cada valor sacado desde a transação?", o: ["Apenas o valor do saque", "Encargos de financiamento e IOF", "Descontos progressivos", "Nada, o saque é gratuito"], c: 1, why: "Sobre o saque incidem juros de financiamento e o imposto IOF desde a data da operação." },
+        { t: "Realização de Saques", q: "Como o valor do SAQUE deve ser pago pelo cliente?", o: ["Em dinheiro no caixa eletrônico", "Por meio do lançamento em FATURA", "Apenas por PIX", "Descontado do salário"], c: 1, why: "O valor do saque é lançado na fatura, podendo ser à vista ou parcelado." },
+        { t: "Realização de Saques", q: "O limite para SAQUE é sempre igual ao limite de compras?", o: ["Sim, obrigatoriamente", "Não, o limite de saque pode ser inferior ao de compras", "Sim, por lei", "Depende apenas do caixa eletrônico"], c: 1, why: "O limite de saque está sujeito a avaliação de crédito e pode ser menor que o limite de compras." },
+        { t: "Realização de Saques", q: "O serviço de saque é gratuito?", o: ["Sim, sempre", "Poderá ser tarifado conforme o contrato", "Sim, apenas no exterior", "Não, custa 50% do valor"], c: 1, why: "O saque é um serviço que pode sofrer cobrança de tarifas, além dos encargos e impostos." },
+                // TÓPICO: COMPRAS E SAQUES INTERNACIONAIS (10 QUESTÕES)
+        { t: "Compras e Saques Internacionais", q: "As transações internacionais estão sujeitas a qual imposto federal?", o: ["IPTU", "IOF", "IPVA", "ISS"], c: 1, why: "Conforme a legislação, transações internacionais sofrem incidência de IOF e são informadas ao Banco Central." },
+        { t: "Compras e Saques Internacionais", q: "O que é recomendado fazer antes de usar o cartão em viagens ao exterior?", o: ["Nada, funciona direto", "Habilitar a função internacional nos canais de atendimento", "Trocar a senha", "Pedir um novo cartão"], c: 1, why: "É importante habilitar a função para evitar transações negadas ou bloqueios preventivos de segurança." },
+        { t: "Compras e Saques Internacionais", q: "O PagSeguro pode bloquear o cartão no exterior mesmo após o aviso de viagem?", o: ["Não, nunca", "Sim, caso detecte algum risco que ofereça prejuízo ao cliente ou ao PagSeguro", "Sim, mas apenas se o cartão vencer", "Apenas se o cliente solicitar"], c: 1, why: "Bloqueios preventivos podem ocorrer por segurança se houver suspeita de risco." },
+        { t: "Compras e Saques Internacionais", q: "Qual a taxa de câmbio utilizada para converter compras feitas em dólar?", o: ["A taxa do dia do fechamento da fatura", "A taxa do dólar do dia da realização da transação", "Uma taxa fixa mensal", "A taxa do dia que o cartão foi emitido"], c: 1, why: "O valor é convertido pela taxa do dia da transação e lançado na fatura na data do processamento." },
+        { t: "Compras e Saques Internacionais", q: "O que acontece se a compra for feita em uma moeda diferente do dólar (ex: Euro)?", o: ["Não é aceita", "Convertida primeiro para dólar e depois para reais", "Convertida direto para reais sem taxas", "O valor é perdido"], c: 1, why: "A moeda estrangeira é convertida inicialmente para dólar americano e depois para reais." },
+        { t: "Compras e Saques Internacionais", q: "A taxa de câmbio usada pelo PagSeguro é igual à taxa média do BACEN?", o: ["Sim, sempre idêntica", "Pode ser superior ou inferior à taxa do BACEN", "É sempre o dobro da taxa do BACEN", "É definida pelo governo federal"], c: 1, why: "A taxa é compatível com o mercado de varejo, podendo variar em relação à média do Banco Central." },
+        { t: "Compras e Saques Internacionais", q: "De quem é a responsabilidade pelos tributos de operações de câmbio no cartão?", o: ["Do PagSeguro", "Do Governo", "Do Cliente (são repassados na fatura)", "Do lojista internacional"], c: 2, why: "Os tributos decorrentes do câmbio são de responsabilidade do cliente." },
+        { t: "Compras e Saques Internacionais", q: "Quem pode receber informações do PagSeguro sobre suas transações no exterior?", o: ["Ninguém", "Apenas o cliente", "BACEN, Receita Federal e outras autoridades", "Redes sociais"], c: 2, why: "O cliente declara ciência de que o PagSeguro informa transações internacionais aos órgãos competentes." },
+        { t: "Compras e Saques Internacionais", q: "Em saques no exterior, além dos impostos, o que mais pode ser cobrado?", o: ["Nada extra", "Tarifas pela empresa responsável pelo terminal (caixa eletrônico)", "Uma multa de viagem", "Apenas gorjetas"], c: 1, why: "Além dos tributos, o dono do terminal (ATM) no exterior pode cobrar tarifas próprias." },
+        { t: "Compras e Saques Internacionais", q: "Como funciona o estorno de uma transação em moeda estrangeira?", o: ["O valor não é devolvido", "Convertido em reais pela taxa do dia do lançamento do estorno na fatura", "Pela taxa do dia da compra original", "Em créditos de viagem"], c: 1, why: "No cancelamento, usa-se a taxa de câmbio do dia em que o estorno for lançado na fatura, mais o IOF." },
+                // TÓPICO: LIMITE DE CRÉDITO (10 QUESTÕES)
+        { t: "Limite de Crédito", q: "A definição do valor do Limite de Crédito está condicionada a quê?", o: ["Apenas ao desejo do cliente", "À análise cadastral e financeira prévia", "Ao tempo de conta", "A um sorteio mensal"], c: 1, why: "O limite é definido com base em análise financeira e cadastral realizada pelo PagSeguro." },
+        { t: "Limite de Crédito", q: "O PagSeguro pode revisar os limites estabelecidos?", o: ["Não, o limite é fixo para sempre", "Sim, a seu exclusivo critério e a qualquer tempo", "Apenas uma vez por ano", "Somente se o cliente pedir"], c: 1, why: "O PagSeguro pode revisar limites e transações a qualquer momento, seguindo a legislação." },
+        { t: "Limite de Crédito", q: "Como o cliente é comunicado sobre aumentos ou reduções de limite?", o: ["Apenas por carta registrada", "Por telefone, SMS, e-mail, aplicativos de mensagem ou fatura", "Não há comunicação", "Apenas pelo Diário Oficial"], c: 1, why: "O PagSeguro utiliza diversos canais digitais e a própria fatura para avisar sobre alterações." },
+        { t: "Limite de Crédito", q: "O que acontece se o cliente tentar usar o cartão sem limite disponível?", o: ["A compra fica pendente", "O PagSeguro negará a utilização do cartão", "O limite fica negativo automaticamente", "O cartão é cancelado na hora"], c: 1, why: "O uso será negado caso não haja limite de crédito disponível no momento da transação." },
+        { t: "Limite de Crédito", q: "O limite pode ser concedido com base em quais garantias?", o: ["Apenas indicação de amigos", "Garantia outorgada, caução ou portabilidade de salário", "Bens imóveis apenas", "Promessa de pagamento futuro"], c: 1, why: "O limite pode ser atrelado a CDBs (garantia), saldo em conta (caução) ou recebimento de salário." },
+        { t: "Limite de Crédito", q: "O que ocorre se houver redução na garantia (ex: resgate de CDB) ou fim da portabilidade de salário?", o: ["O limite aumenta", "O limite permanece igual", "O PagSeguro pode reduzir ou cancelar integralmente o limite", "O cliente ganha um bônus"], c: 2, why: "Se a base da garantia diminuir ou o salário parar de cair na conta, o limite pode ser reduzido ou cortado." },
+        { t: "Limite de Crédito", q: "Onde o valor do limite disponível pode ser consultado?", o: ["Apenas no caixa eletrônico", "Na fatura ou nos canais digitais do PagSeguro", "Ligando para o Banco Central", "Não é possível consultar"], c: 1, why: "O limite está sempre disponível para consulta rápida no app ou na fatura mensal." },
+        { t: "Limite de Crédito", q: "Como as compras e saques afetam o limite?", o: ["Não afetam", "Eles comprometem o limite de crédito a cada uso", "Eles aumentam o limite", "Eles só afetam após 30 dias"], c: 1, why: "Cada transação realizada 'consome' parte do valor total do seu limite disponível." },
+        { t: "Limite de Crédito", q: "Quando o limite de crédito é recomposto (liberado novamente)?", o: ["No dia do aniversário do cliente", "Assim que o pagamento da fatura for processado nos sistemas", "Imediatamente ao passar o cartão", "Somente no ano seguinte"], c: 1, why: "A recomposição é proporcional ao valor pago e ocorre após o processamento do pagamento." },
+        { t: "Limite de Crédito", q: "O que o cliente deve fazer antes de utilizar o cartão?", o: ["Verificar o limite disponível e possíveis comunicações", "Pedir autorização por telefone", "Reiniciar o celular", "Validar o cartão na loja"], c: 0, why: "É responsabilidade do cliente conferir se há saldo disponível e se houve avisos sobre o limite." },
+                // TÓPICO: LIMITE COM USO DO SALDO (10 QUESTÕES)
+        { t: "Limite com Uso do Saldo", q: "O que é necessário para solicitar o 'Limite com Uso do Saldo da Conta'?", o: ["Ter um fiador", "Possuir saldo na Conta PagSeguro para bloquear como caução", "Ter mais de 5 anos de conta", "Apenas solicitar por telefone"], c: 1, why: "O cliente indica um valor de seu saldo para ser bloqueado e convertido em limite de crédito." },
+        { t: "Limite com Uso do Saldo", q: "O que acontece com o valor indicado pelo cliente após a aprovação?", o: ["O valor é sacado pelo PagSeguro", "O valor fica bloqueado na conta para constituição da CAUÇÃO", "O valor é doado", "O valor dobra automaticamente"], c: 1, why: "O saldo escolhido fica bloqueado para garantir o limite de crédito concedido." },
+        { t: "Limite com Uso do Saldo", q: "A solicitação de bloqueio do saldo é considerada o quê perante a lei?", o: ["Uma doação ao banco", "Concordância com a majoração (aumento) do limite de crédito", "Um erro sistêmico", "Uma simples reserva"], c: 1, why: "Ao solicitar o bloqueio, você concorda formalmente com o aumento do seu limite de crédito." },
+        { t: "Limite com Uso do Saldo", q: "É possível reduzir ou cancelar esse limite a qualquer momento?", o: ["Não, nunca", "Sim, desde que o limite não esteja comprometido com compras", "Apenas se o PagSeguro quiser", "Somente após 12 meses"], c: 1, why: "A redução ou cancelamento só pode ser feita se o valor do limite não estiver sendo usado em compras ou dívidas." },
+        { t: "Limite com Uso do Saldo", q: "Caso o limite esteja EM USO, quando o cancelamento pode ser feito?", o: ["A qualquer hora", "Somente após a integral quitação do valor usado", "Em 48 horas", "Nunca pode ser cancelado"], c: 1, why: "Se você usou o limite, precisa pagar a dívida primeiro para depois liberar o saldo bloqueado." },
+        { t: "Limite com Uso do Saldo", q: "O que acontece com a CAUÇÃO se o cliente não pagar as obrigações do contrato?", o: ["Ela permanece bloqueada para sempre", "O PagSeguro está autorizado a utilizá-la para quitar a dívida", "Ela é devolvida ao cliente", "Ela é transferida para o governo"], c: 1, why: "A caução serve como garantia para satisfação integral de dívidas, juros e multas." },
+        { t: "Limite com Uso do Saldo", q: "O valor bloqueado como CAUÇÃO gera rendimentos ou juros para o cliente?", o: ["Sim, rende 100% do CDI", "Não gera qualquer tipo de rendimento ou remuneração", "Rende apenas se o dólar subir", "Rende 1% ao mês"], c: 1, why: "O contrato é claro: o valor em caução não gera nenhum tipo de remuneração ao cliente." },
+        { t: "Limite com Uso do Saldo", q: "Além da caução, o PagSeguro pode reter outros ativos em caso de inadimplência?", o: ["Não, apenas a caução", "Sim, pode reter/bloquear quaisquer bens ou recursos sob posse do PagSeguro", "Apenas se houver ordem judicial prévia", "Somente o saldo de cashback"], c: 1, why: "O PagSeguro tem autorização contratual para reter ativos sob sua posse para garantir o cumprimento das obrigações." },
+        { t: "Limite com Uso do Saldo", q: "Quais obrigações a caução garante?", o: ["Apenas compras", "Apenas multas", "Principais, acessórias, moratórias, presentes e futuras", "Somente parcelamentos"], c: 2, why: "A garantia abrange tudo: dívida principal, juros, multas, encargos e parcelamentos." },
+        { t: "Limite com Uso do Saldo", q: "Após o cancelamento (sem uso do limite), em quanto tempo o saldo é liberado?", o: ["Imediatamente após a solicitação e processamento", "Em 30 dias", "O saldo nunca é liberado", "Somente se o cliente fizer um novo depósito"], c: 0, why: "Uma vez solicitado o cancelamento e não havendo dívidas, a caução é liberada na conta." },
+                // TÓPICO: FATURA E PAGAMENTOS (12 QUESTÕES)
+        { t: "Fatura e Pagamentos", q: "Como a FATURA é disponibilizada mensalmente ao cliente?", o: ["Apenas por carta registrada", "Canais digitais, parceiros ou por e-mail", "Apenas por telefone", "Publicada no site do Governo"], c: 1, why: "A fatura é digital, enviada por e-mail ou disponível nos canais oficiais do PagSeguro." },
+        { t: "Fatura e Pagamentos", q: "O que deve ser feito se a fatura não chegar até a data de vencimento?", o: ["Esperar o mês seguinte", "Não pagar, pois a culpa é do banco", "Entrar em contato com o PagSeguro imediatamente", "Cancelar o cartão"], c: 2, why: "O não recebimento da fatura não desobriga o cliente de efetuar o pagamento até o vencimento." },
+        { t: "Fatura e Pagamentos", q: "Qual a recomendação ao identificar uma compra em desacordo na fatura?", o: ["Ignorar o lançamento", "Resolver diretamente com o ESTABELECIMENTO primeiro", "Processar o PagSeguro", "Pedir um novo cartão"], c: 1, why: "A solução direta com o lojista é considerada mais rápida e eficaz pelo contrato." },
+        { t: "Fatura e Pagamentos", q: "Qual o prazo máximo para contestar uma despesa na fatura?", o: ["30 dias", "90 dias da data da COMPRA", "1 ano", "7 dias"], c: 1, why: "O cliente tem até 90 dias após a compra para registrar uma reclamação e apresentar documentos." },
+        { t: "Fatura e Pagamentos", q: "O que acontece se o cliente NÃO questionar os lançamentos em até 90 dias?", o: ["O valor é estornado automaticamente", "Implica reconhecimento e aceitação da dívida", "O limite aumenta", "O banco devolve o dinheiro"], c: 1, why: "Após o prazo, não há mais possibilidade de estorno de valores não questionados." },
+        { t: "Fatura e Pagamentos", q: "O que é o 'Crédito em Confiança' citado no contrato?", o: ["Um bônus por bom pagamento", "Restituição temporária do limite de valores contestados", "Um empréstimo com juros altos", "O cancelamento da anuidade"], c: 1, why: "É um crédito provisório feito enquanto a Bandeira analisa a contestação da despesa." },
+        { t: "Fatura e Pagamentos", q: "Se uma compra contestada for parcelada, o que o cliente deve fazer com as parcelas?", o: ["Parar de pagar imediatamente", "Efetuar o pagamento das parcelas remanescentes", "Pedir para o lojista pagar", "O sistema ignora as parcelas"], c: 1, why: "Mesmo em contestação, as parcelas em aberto devem continuar sendo pagas pelo cliente." },
+        { t: "Fatura e Pagamentos", q: "O que ocorre se a análise da BANDEIRA apurar que o gasto é de responsabilidade do cliente?", o: ["O cliente ganha o valor", "Os valores são lançados novamente na fatura para pagamento", "A conta é bloqueada", "O lojista é multado"], c: 1, why: "Se a cobrança for considerada regular, o crédito em confiança é retirado e o valor volta para a fatura." },
+        { t: "Fatura e Pagamentos", q: "Se o vencimento da fatura cair em um dia NÃO ÚTIL (ex: Domingo), o que acontece?", o: ["O pagamento deve ser antecipado", "O pagamento é estendido para o dia útil subsequente", "Gera multa automática", "A fatura é cancelada"], c: 1, why: "O prazo é prorrogado para o próximo dia útil sem penalidades." },
+        { t: "Fatura e Pagamentos", q: "Quais são as formas de pagamento aceitas para a fatura?", o: ["Apenas dinheiro em espécie", "Boleto bancário ou débito do saldo da conta PagSeguro", "Apenas transferência internacional", "Permuta de serviços"], c: 1, why: "O cliente pode usar o boleto anexo ou o próprio saldo disponível na conta." },
+        { t: "Fatura e Pagamentos", q: "Quais informações obrigatórias devem constar na FATURA?", o: ["Apenas o valor total", "Gastos, juros, tributos, CET, multas e vencimento", "Apenas a senha do cartão", "Lista de lojas recomendadas"], c: 1, why: "A fatura deve detalhar todos os custos, impostos (IOF), CET e encargos moratórios." },
+        { t: "Fatura e Pagamentos", q: "O PagSeguro pode cobrar encargos se uma transação reclamada for considerada regular?", o: ["Não, é proibido", "Sim, a transação será mantida ou relançada com encargos", "Apenas se o valor for alto", "Somente se o cliente autorizar"], c: 1, why: "Caso a compra seja legítima, ela volta para a fatura com os devidos encargos do período." },
+                // TÓPICO: OPÇÕES DE PAGAMENTO E CRÉDITO (15 QUESTÕES)
+        { t: "Opções de Pagamento e Crédito", q: "Quais são as três opções de pagamento da fatura disponíveis?", o: ["Total, Parcial ou Mínimo", "À vista, Parcelado ou Boleto", "Total, Parcial ou parcelamento oferecido", "Débito, Crédito ou PIX"], c: 2, why: "O cliente pode pagar o total, qualquer valor acima do mínimo (parcial) ou aderir a parcelamentos." },
+        { t: "Opções de Pagamento e Crédito", q: "O que compõe o 'Pagamento Total' da fatura?", o: ["Apenas as compras do mês", "Saldo anterior, parcelas, saques, compras, encargos e tarifas", "Somente o valor dos saques", "Apenas o que foi gasto no cartão físico"], c: 1, why: "O total soma todos os débitos, desde compras e saques até tarifas e saldos de meses anteriores." },
+        { t: "Opções de Pagamento e Crédito", q: "O que acontece com o saldo se o cliente fizer um pagamento PARCIAL e não usou o rotativo no mês anterior?", o: ["O saldo é perdoado", "Será financiado via Crédito Rotativo com encargos", "O cartão é cancelado", "O limite dobra"], c: 1, why: "O saldo restante entra no crédito rotativo até a próxima fatura, com juros." },
+        { t: "Opções de Pagamento e Crédito", q: "E se o cliente já tiver usado o rotativo no mês anterior e pagar parcial de novo?", o: ["Usa o rotativo novamente", "O PagSeguro poderá oferecer opções de PARCELAMENTO", "A conta é bloqueada", "O juro é zerado"], c: 1, why: "Pela regra do BACEN, o rotativo só pode ser usado por 30 dias; depois, deve-se parcelar o saldo." },
+        { t: "Opções de Pagamento e Crédito", q: "O limite de crédito é restabelecido imediatamente após aderir ao parcelamento?", o: ["Sim, na hora", "Não, é recomposto conforme os pagamentos mensais são feitos", "Sim, após 24 horas", "Não, o limite fica zerado até o fim do contrato"], c: 1, why: "A recomposição do limite é proporcional ao pagamento de cada parcela." },
+        { t: "Opções de Pagamento e Crédito", q: "O que é o Crédito Rotativo?", o: ["Um desconto na fatura", "Uma linha de crédito emergencial para saldo não pago", "Um programa de pontos", "O pagamento antecipado"], c: 1, why: "É um financiamento automático do saldo que você não pagou na data do vencimento." },
+        { t: "Opções de Pagamento e Crédito", q: "Qual o prazo máximo para liquidar o Crédito Rotativo?", o: ["Até o fim do ano", "Até o vencimento da próxima fatura", "Em 12 meses", "Não há prazo"], c: 1, why: "Ele deve ser pago integralmente ou parcelado na fatura seguinte." },
+        { t: "Opções de Pagamento e Crédito", q: "O que pode ser comunicado através da FATURA além dos gastos?", o: ["Apenas propagandas", "Novas tarifas, alterações no contrato e avisos de interesse", "Fofocas do mercado", "Nada além dos gastos"], c: 1, why: "A fatura é um canal oficial de comunicação sobre taxas e regras contratuais." },
+        { t: "Opções de Pagamento e Crédito", q: "O que é a Liquidação Antecipada?", o: ["Pagar antes de comprar", "Pagar o saldo devedor antes do prazo com desconto proporcional de juros", "Pagar o valor mínimo", "Cancelar o cartão"], c: 1, why: "O cliente tem direito a pagar antes e abater parte dos juros, conforme o CDC." },
+        { t: "Opções de Pagamento e Crédito", q: "O PagSeguro tem autorização para debitar o saldo da conta em caso de atraso?", o: ["Não, é proibido", "Sim, de forma expressa e irrevogável conforme o contrato", "Apenas com ordem judicial", "Somente se o cliente autorizar no dia"], c: 1, why: "O contrato prevê que, se não houver pagamento, o saldo da conta pode ser usado para quitar a dívida." },
+        { t: "Opções de Pagamento e Crédito", q: "Como o CDB (Investimento) afeta o limite de crédito?", o: ["Não afeta", "O limite pode ser baseado no valor aplicado em CDBs (Cessão Fiduciária)", "O CDB impede o uso do cartão", "O CDB é usado para pagar a anuidade"], c: 1, why: "O investimento em CDB serve como garantia para a concessão do limite." },
+        { t: "Opções de Pagamento e Crédito", q: "O PagSeguro pode impedir o resgate do CDB do cliente?", o: ["Nunca", "Sim, pode bloquear a garantia em datas de uso do cartão para evitar risco", "Apenas se o cliente falecer", "Somente nos finais de semana"], c: 1, why: "O valor investido fica bloqueado proporcionalmente ao uso do crédito." },
+        { t: "Opções de Pagamento e Crédito", q: "O que acontece com os recursos de um CDB que venceu se houver dívida no cartão?", o: ["São liberados ao cliente", "O PagSeguro pode reter os recursos para recompor a garantia ou quitar débitos", "São transferidos ao governo", "O título é cancelado"], c: 1, why: "Recursos de resgate ou vencimento podem ser retidos para garantir o pagamento do cartão." },
+        { t: "Opções de Pagamento e Crédito", q: "Para que serve a 'Procuração' outorgada ao PagSeguro na cláusula 4.13.5?", o: ["Para o PagSeguro votar pelo cliente", "Para resgatar e vender a garantia (CDB) em caso de inadimplência", "Para abrir novas contas", "Para alterar o endereço do cliente"], c: 1, why: "Dá poderes para o PagSeguro usar o investimento para pagar a fatura atrasada." },
+        { t: "Opções de Pagamento e Crédito", q: "Quando a garantia (CDB) é liberada?", o: ["Somente após 5 anos", "Na proporção do pagamento das obrigações realizado", "Nunca é liberada", "No dia do aniversário do cliente"], c: 1, why: "Conforme você paga a dívida, o valor equivalente do investimento é desbloqueado." },
+
+        // TÓPICO: ATRASO E INADIMPLÊNCIA (15 QUESTÕES)
+        { t: "Atraso e Inadimplência", q: "Quando o cliente é considerado oficialmente 'em atraso'?", o: ["Após 30 dias", "Se não pagar ou pagar valor inferior ao MÍNIMO até o vencimento", "Se esquecer a senha", "Se o limite acabar"], c: 1, why: "Qualquer valor abaixo do mínimo na data certa já caracteriza atraso." },
+        { t: "Atraso e Inadimplência", q: "Quais encargos incidem sobre o valor em atraso?", o: ["Apenas juros", "Multa de 2%, juros de mora de 1% ao mês, juros remuneratórios e tributos", "Taxa de 10% fixo", "Nenhum encargo"], c: 1, why: "O atraso gera multa, juros moratórios e juros remuneratórios pro rata die." },
+        { t: "Atraso e Inadimplência", q: "O atraso pode causar o bloqueio ou cancelamento do cartão?", o: ["Não, o cartão é vitalício", "Sim, independentemente de notificação", "Apenas após 6 meses", "Somente se o cliente autorizar"], c: 1, why: "O descumprimento do contrato permite o cancelamento imediato dos serviços." },
+        { t: "Atraso e Inadimplência", q: "O que o PagSeguro pode fazer com o nome do cliente em caso de atraso?", o: ["Nada, por causa do sigilo", "Inscrição nos órgãos de proteção ao crédito (SPC/Serasa)", "Publicar em redes sociais", "Enviar uma carta para os vizinhos"], c: 1, why: "O inadimplemento permite a negativação do CPF ou CNPJ nos órgãos competentes." },
+        { t: "Atraso e Inadimplência", q: "O que é o 'Vencimento Antecipado' das obrigações?", o: ["Pagar a fatura antes do dia 10", "Poder exigir o pagamento de TODO o saldo devedor de uma só vez devido ao atraso", "Receber o salário antes", "Um bônus de pontualidade"], c: 1, why: "Se o cliente falha em uma obrigação, o PagSeguro pode considerar todo o contrato vencido e cobrar tudo." },
+        { t: "Atraso e Inadimplência", q: "No vencimento antecipado, quais valores podem ser cobrados de imediato?", o: ["Apenas a próxima parcela", "Faturas vencidas e todos os gastos realizados até o fechamento da próxima", "Somente a anuidade", "Apenas saques"], c: 1, why: "O banco pode cobrar tudo o que já foi gasto, mesmo o que ainda não venceu." },
+        { t: "Atraso e Inadimplência", q: "Quem responde pelas dívidas se o cliente for uma Pessoa Jurídica (Empresa)?", o: ["Ninguém, a empresa fecha", "O Sócio Garantidor responde de forma integral e solidária", "Apenas os funcionários", "O Governo Federal"], c: 1, why: "O sócio assume a responsabilidade total pelas dívidas feitas no cartão da empresa." },
+        { t: "Atraso e Inadimplência", q: "O Sócio Garantidor pode ser cobrado pelos mesmos mecanismos que a empresa?", o: ["Não, apenas a empresa", "Sim, inclusive com direitos de cobrança previstos em lei", "Somente via processo judicial longo", "Apenas se ele quiser"], c: 1, why: "A responsabilidade solidária permite cobrar o sócio diretamente." },
+        { t: "Atraso e Inadimplência", q: "O PagSeguro pode vender bens ou ativos do cliente para quitar dívidas?", o: ["Nunca", "Sim, conforme autorizado na cláusula de garantia e inadimplemento", "Apenas carros", "Somente se forem bens físicos"], c: 1, why: "Ativos e direitos sob posse do PagSeguro podem ser liquidados para pagar a dívida." },
+        { t: "Atraso e Inadimplência", q: "O que significa 'Juros Moratórios' de 1% ao mês?", o: ["Juros por desistência", "Juros cobrados pelo atraso no pagamento", "Juros por usar o cartão no exterior", "Juros de rendimento"], c: 1, why: "Mora significa atraso; é a taxa punitiva pelo tempo que o valor ficou sem ser pago." },
+        { t: "Atraso e Inadimplência", q: "Qual o valor da MULTA por atraso prevista no contrato?", o: ["10%", "2%", "5%", "1%"], c: 1, why: "A multa por atraso é fixada em 2% sobre o valor devido." },
+        { t: "Atraso e Inadimplência", q: "A autorização para débito em conta vale por quanto tempo?", o: ["Por 1 mês", "Enquanto o contrato permanecer em vigor", "Até o cartão vencer", "Por um ano"], c: 1, why: "A autorização é contínua enquanto durar a relação contratual." },
+        { t: "Atraso e Inadimplência", q: "O PagSeguro pode cobrar honorários de cobrança do cliente inadimplente?", o: ["Não, é proibido", "Sim, conforme previsto na cláusula de obrigações garantidas", "Apenas se o juiz mandar", "Somente se o cliente concordar no dia"], c: 1, why: "Custos para recuperar o dinheiro (honorários) são repassados ao devedor." },
+        { t: "Atraso e Inadimplência", q: "O que acontece se houver saldo em mais de uma conta PagSeguro do mesmo cliente?", o: ["Nada", "O débito pode ser feito em qualquer uma delas até atingir o valor devedor", "Somente na conta principal", "As contas são fundidas"], c: 1, why: "O contrato autoriza o débito em 'suas contas' (plural)." },
+        { t: "Atraso e Inadimplência", q: "O cancelamento por atraso precisa de aviso prévio?", o: ["Sim, 30 dias antes", "Pode ocorrer independentemente de notificação", "Sim, por carta registrada", "Não, mas só ocorre após 1 ano"], c: 1, why: "O descumprimento de cláusulas permite a rescisão imediata por segurança do emissor." },
+                // TÓPICO: MANDATO E FINANCIAMENTO (12 QUESTÕES)
+        { t: "Mandato e Financiamento", q: "Para que serve o 'Mandato' outorgado ao PagSeguro na Cláusula 7?", o: ["Para o PagSeguro fazer compras no nome do cliente", "Para negociar e obter crédito perante bancos para financiar o saldo da fatura", "Para cancelar o CPF do cliente", "Para vender o cartão a terceiros"], c: 1, why: "O mandato permite que o PagSeguro atue como procurador para obter financiamentos em nome do cliente." },
+        { t: "Mandato e Financiamento", q: "Quem o cliente nomeia como seu 'bastante procurador' para obter crédito?", o: ["O Banco Central", "O PagSeguro", "O lojista", "O gerente da conta"], c: 1, why: "O cliente nomeia o PagSeguro para assinar contratos de financiamento e cédulas de crédito em seu nome." },
+        { t: "Mandato e Financiamento", q: "Como o cliente pode evitar a outorga desse mandato?", o: ["Apenas pedindo por escrito", "Pagando a fatura integralmente e não realizando saques", "Desativando o Wi-Fi", "Não há como evitar"], c: 1, why: "O mandato só é exercido se houver necessidade de financiar saldo ou realizar saques." },
+        { t: "Mandato e Financiamento", q: "O PagSeguro pode compartilhar dados cadastrais com bancos parceiros?", o: ["Não, devido ao sigilo absoluto", "Sim, com a finalidade única de obter crédito para saldar a fatura", "Apenas se o cliente autorizar no dia do saque", "Somente dados de redes sociais"], c: 1, why: "A autorização é necessária para viabilizar os financiamentos previstos no contrato." },
+        { t: "Mandato e Financiamento", q: "Qual o papel do PagSeguro na obtenção do financiamento do saldo devedor?", o: ["Apenas um intermediário sem riscos", "Fiador, avalista e principal garantidor", "Dono do dinheiro", "Fiscal do Banco Central"], c: 1, why: "O PagSeguro garante o pagamento perante a instituição financeira que cede o crédito." },
+        { t: "Mandato e Financiamento", q: "O que acontece se o cliente ficar inadimplente perante o banco que financiou a fatura?", o: ["O banco perdoa a dívida", "O PagSeguro liquida o valor e passa a cobrar o cliente diretamente", "O cliente perde o CPF", "A dívida desaparece após 30 dias"], c: 1, why: "O PagSeguro honra a dívida como garantidor e assume o direito de cobrança contra o cliente." },
+        { t: "Mandato e Financiamento", q: "Para que fim o PagSeguro deve usar os recursos obtidos nos financiamentos?", o: ["Investimentos próprios", "Exclusivamente para pagamento de despesas do cartão ou quitar financiamentos anteriores", "Para pagar funcionários", "Para publicidade"], c: 1, why: "O recurso tem destinação carimbada para as despesas do cartão do cliente." },
+        { t: "Mandato e Financiamento", q: "O PagSeguro pode repactuar taxas de juros em nome do cliente?", o: ["Não, isso é proibido", "Sim, faz parte dos poderes de mandato para obter crédito", "Apenas com autorização judicial", "Somente se o juro for zero"], c: 1, why: "O mandato inclui poderes para acertar prazos, juros e ônus da dívida financiada." },
+        { t: "Mandato e Financiamento", q: "Onde as tarifas cobradas pela prestação de serviços são informadas?", o: ["Apenas por telefone", "Canais digitais e indicadas na FATURA", "Não são informadas", "Apenas no contrato social"], c: 1, why: "O PagSeguro deve dar transparência sobre tarifas conforme regulação do BACEN." },
+        { t: "Mandato e Financiamento", q: "O mandato é exercido sem limites?", o: ["Sim, o PagSeguro pode tudo", "Não, é exercido exclusivamente nos limites estabelecidos no contrato", "Sim, mas apenas no Brasil", "Não, expira todo mês"], c: 1, why: "O mandato é restrito às finalidades de financiamento e saque descritas no documento." },
+        { t: "Mandato e Financiamento", q: "O PagSeguro pode cobrar tarifas por qualquer serviço?", o: ["Sim, o valor que quiser", "Sim, desde que autorizado pelo BACEN e informado previamente", "Não, todos os serviços devem ser grátis", "Apenas tarifas de saque"], c: 1, why: "A cobrança deve seguir a regulação bancária e ter aviso prévio ao consumidor." },
+        { t: "Mandato e Financiamento", q: "O que o mandato permite assinar em nome do cliente?", o: ["Cheques sem fundo", "Contratos de financiamento e cédulas de crédito bancário", "Contrato de aluguel", "Termos de demissão"], c: 1, why: "Poderes específicos para formalizar as operações de crédito do cartão." },
+
+        // TÓPICO: SEGURANÇA E EXTRAVIO (13 QUESTÕES)
+        { t: "Segurança e Extravio", q: "Como o cartão é enviado pelo PagSeguro por segurança?", o: ["Já desbloqueado", "Sempre bloqueado para utilização", "Com a senha anotada no verso", "Dentro de uma caixa forte"], c: 1, why: "O cartão só é ativado após o recebimento e ação do cliente nos canais digitais." },
+        { t: "Segurança e Extravio", q: "O que o ato de desbloquear o cartão representa?", o: ["Apenas um teste técnico", "Confirmação da adesão ao contrato e suas regras", "O fim da garantia", "Um sorteio de prêmios"], c: 1, why: "O desbloqueio é o aceite formal de todos os termos do contrato." },
+        { t: "Segurança e Extravio", q: "Como a senha é enviada ao cliente?", o: ["Por carta registrada", "Via SMS para o número cadastrado", "O cliente escolhe na hora da compra", "Vem escrita no manual"], c: 1, why: "O PagSeguro envia a senha por SMS para o celular de cadastro." },
+        { t: "Segurança e Extravio", q: "Qual a recomendação de segurança sobre o SMS da senha?", o: ["Guardar para sempre", "Excluir da memória do aparelho após memorizar", "Enviar para um amigo", "Anotar no próprio cartão"], c: 1, why: "Excluir o SMS evita que terceiros tenham acesso à senha caso o celular seja roubado." },
+        { t: "Segurança e Extravio", q: "O que fazer em caso de perda, roubo ou suspeita de uso por terceiros?", o: ["Esperar a fatura chegar", "Comunicar imediatamente ao PagSeguro pelos canais de atendimento", "Nada, o banco percebe sozinho", "Tentar bloquear pelo lojista"], c: 1, why: "A comunicação imediata é dever do cliente para evitar fraudes." },
+        { t: "Segurança e Extravio", q: "Qual documento deve ser apresentado em caso de furto ou roubo?", o: ["RG original", "Boletim de Ocorrência (B.O.)", "Comprovante de residência", "Extrato bancário"], c: 1, why: "O B.O. é necessário para que o PagSeguro formalize o bloqueio e cancelamento." },
+        { t: "Segurança e Extravio", q: "Quem responde pelas transações feitas ANTES da comunicação do extravio?", o: ["O PagSeguro", "O cliente (inteira e exclusiva responsabilidade)", "A Bandeira do cartão", "A Polícia"], c: 1, why: "Até que o cliente avise o banco, ele é responsável por tudo o que for gasto no cartão." },
+        { t: "Segurança e Extravio", q: "O PagSeguro pode cobrar pela emissão de uma 2ª via do cartão?", o: ["Não, é sempre grátis", "Sim, poderá cobrar tarifa conforme os canais digitais", "Apenas se for o primeiro cartão", "Somente se o cliente for rico"], c: 1, why: "Em casos de perda ou dano provocado, a tarifa de emissão é aplicável." },
+        { t: "Segurança e Extravio", q: "O PagSeguro solicita senhas ou números de cartões por telefone ou e-mail?", o: ["Sim, para confirmar dados", "Nunca solicita esse tipo de informação por esses canais", "Sim, apenas a senha", "Somente via WhatsApp"], c: 1, why: "O PagSeguro alerta que nunca pede dados sensíveis de forma ativa para evitar golpes." },
+        { t: "Segurança e Extravio", q: "O que o PagSeguro pode fazer se detectar operações fora do padrão de uso?", o: ["Ignorar", "Bloquear o cartão preventivamente por segurança", "Aumentar o limite", "Mudar a senha sozinho"], c: 1, why: "O bloqueio preventivo serve para proteger o cliente de possíveis fraudes em curso." },
+        { t: "Segurança e Extravio", q: "O PagSeguro pode deixar de realizar transações em locais de risco?", o: ["Não, o cartão deve passar em qualquer lugar", "Sim, como medida de segurança para manter a confiabilidade", "Apenas se o cliente autorizar", "Somente após a meia-noite"], c: 1, why: "Locais ou horários de alto risco podem ser bloqueados pelo sistema de segurança." },
+        { t: "Segurança e Extravio", q: "A falta de atualização cadastral impacta a responsabilidade por fraudes?", o: ["Não", "Sim, acarreta ao cliente a responsabilidade por transações feitas por terceiros", "Apenas se o cliente mudar de cidade", "O banco assume a culpa"], c: 1, why: "Dados atualizados garantem que o banco possa avisar e confirmar transações suspeitas." },
+        { t: "Segurança e Extravio", q: "Onde o cliente deve guardar o cartão e a senha?", o: ["Juntos na carteira", "Cartão em local seguro e senha apenas na memória (sigilo)", "No porta-luvas do carro", "Colada no monitor"], c: 1, why: "A recomendação é nunca guardar a senha junto com o cartão para evitar facilitação de uso por terceiros." },
+
+        // TÓPICO: CANCELAMENTO E BLOQUEIO (15 QUESTÕES)
+        { t: "Cancelamento e Bloqueio", q: "Qual a vigência deste contrato?", o: ["12 meses", "Prazo indeterminado", "Até a validade impressa no cartão", "24 meses"], c: 1, why: "O contrato vale por tempo indeterminado, mesmo que o plástico do cartão vença." },
+        { t: "Cancelamento e Bloqueio", q: "O cliente pode cancelar o cartão a qualquer momento?", o: ["Sim, sem necessidade de especificar o motivo e com efeitos imediatos", "Não, precisa esperar 1 ano", "Apenas se não tiver dívidas", "Somente se enviar uma carta pelo correio"], c: 0, why: "O direito de cancelamento pelo cliente é livre e imediato via canais de atendimento." },
+        { t: "Cancelamento e Bloqueio", q: "Qual o prazo de aviso prévio se o PAGSEGURO quiser cancelar o cartão sem motivo?", o: ["Não precisa de aviso", "15 (quinze) dias", "30 dias", "60 dias"], c: 1, why: "O PagSeguro pode rescindir o contrato imotivadamente avisando com 15 dias de antecedência." },
+        { t: "Cancelamento e Bloqueio", q: "O que acontece se o cliente fornecer informações falsas no cadastro?", o: ["O limite diminui", "Bloqueio e/ou cancelamento imediato sem aviso prévio", "O banco cobra uma multa", "Nada acontece"], c: 1, why: "Informações falsas são violação grave e geram rescisão imediata." },
+        { t: "Cancelamento e Bloqueio", q: "A falta de uso do cartão por quanto tempo gera cancelamento?", o: ["3 meses", "12 meses consecutivos", "6 meses", "24 meses"], c: 1, why: "A inatividade por 1 ano permite que o banco cancele o cartão." },
+        { t: "Cancelamento e Bloqueio", q: "Usar o cartão para jogos de azar ou finalidades ilegais causa o quê?", o: ["Um aviso de advertência", "Bloqueio e/ou cancelamento imediato", "Ganho de pontos", "O dobro de juros"], c: 1, why: "Uso indevido ou ilegal fere os termos da Bandeira e do Contrato." },
+        { t: "Cancelamento e Bloqueio", q: "Se o contrato for encerrado, o cliente deixa de pagar o que deve?", o: ["Sim, a dívida acaba", "Não, continua responsável pelo saldo em aberto e parcelas", "Apenas as compras futuras", "O sócio paga tudo sozinho"], c: 1, why: "O fim do contrato não quita as dívidas já feitas; elas devem ser pagas até o fim." },
+        { t: "Cancelamento e Bloqueio", q: "O que o cliente deve fazer com o cartão físico após o cancelamento?", o: ["Guardar de recordação", "Destruir o cartão", "Devolver pelo correio", "Vender o chip"], c: 1, why: "A destruição física evita o uso indevido após o encerramento sistêmico." },
+        { t: "Cancelamento e Bloqueio", q: "Restrições de crédito (Serasa/SCPC) permitem o cancelamento pelo banco?", o: ["Não, isso é preconceito", "Sim, é uma das hipóteses de cancelamento imediato", "Apenas se a dívida for no PagSeguro", "Somente se o juiz mandar"], c: 1, why: "A saúde financeira do cliente é critério de manutenção do crédito." },
+        { t: "Cancelamento e Bloqueio", q: "O PagSeguro pode alterar o contrato sozinho?", o: ["Não, nunca", "Sim, comunicando o cliente previamente (inclusive via fatura)", "Apenas se o cliente for até a agência", "Somente se o dólar subir"], c: 1, why: "Alterações são permitidas com aviso prévio; o uso contínuo após o aviso implica aceite." },
+        { t: "Cancelamento e Bloqueio", q: "E se o cliente não concordar com uma alteração no contrato?", o: ["Deve processar o banco", "Poderá solicitar o cancelamento do cartão imediatamente", "O contrato antigo continua valendo para ele", "Ele pode mudar as regras sozinho"], c: 1, why: "A discordância dá ao cliente o direito de encerrar a relação contratual." },
+        { t: "Cancelamento e Bloqueio", q: "O que acontece se o cliente usar o cartão APÓS um aviso de alteração contratual?", o: ["O cartão bloqueia", "Entende-se que ele aceitou as novas condições", "A compra é grátis", "Gera uma multa"], c: 1, why: "O uso após a comunicação configura o 'aceite tácito' das novas regras." },
+        { t: "Cancelamento e Bloqueio", q: "Empréstimo do cartão a terceiros (exceto adicional) é permitido?", o: ["Sim, para parentes", "Não, é motivo para bloqueio/cancelamento imediato", "Sim, se o cliente der a senha", "Apenas para compras online"], c: 1, why: "O cartão é pessoal e intransferível por questões de segurança e crédito." },
+        { t: "Cancelamento e Bloqueio", q: "Omissão de atualização cadastral permite o cancelamento?", o: ["Não, o banco que deve procurar", "Sim, é dever do cliente manter os dados atualizados", "Apenas se mudar o CPF", "Somente se o cartão vencer"], c: 1, why: "Dados desatualizados impedem a comunicação e análise de risco." },
+        { t: "Cancelamento e Bloqueio", q: "O reconhecimento judicial de falta de recursos para pagar permite o cancelamento?", o: ["Não", "Sim, gera cancelamento imediato do contrato", "O banco é obrigado a dar mais crédito", "Aumenta o prazo de pagamento"], c: 1, why: "A insolvência do cliente encerra a confiança necessária para o crédito." },
+
+        // TÓPICO: DISPOSIÇÕES GERAIS E CANAIS (10 QUESTÕES)
+        { t: "Disposições Gerais e Canais", q: "Qual o foro eleito para dirimir controvérsias deste contrato?", o: ["Brasília", "Central da Comarca de São Paulo (podendo optar pelo domicílio do cliente)", "Rio de Janeiro", "Qualquer um no exterior"], c: 1, why: "O contrato define SP como sede, mas respeita o direito do consumidor de usar o foro de onde mora." },
+        { t: "Disposições Gerais e Canais", q: "O PagSeguro pode ceder o contrato para terceiros?", o: ["Não, nunca", "Sim, a qualquer momento e independente de aviso", "Apenas com autorização do cliente", "Apenas se o cliente falecer"], c: 1, why: "O banco tem liberdade para transferir seus direitos de crédito e contrato para empresas do grupo ou parceiros." },
+        { t: "Disposições Gerais e Canais", q: "O que significa a cláusula de 'Crédito Consciente'?", o: ["O banco vai pagar as contas", "Aviso de que o uso excessivo de limite e rotativo gera endividamento difícil", "Um curso obrigatório", "Desconto para quem não usa o cartão"], c: 1, why: "É um alerta sobre os riscos financeiros do uso impensado do crédito." },
+        { t: "Disposições Gerais e Canais", q: "O que é o sistema SCR do Banco Central?", o: ["Um site de compras", "Sistema de Informações de Crédito sobre dívidas, coobrigações e garantias", "Um novo tipo de cartão", "Um chat de atendimento"], c: 1, why: "O SCR consolida as informações de crédito de todos os cidadãos para o BACEN." },
+        { t: "Disposições Gerais e Canais", q: "O cliente autoriza o PagSeguro a consultar o SCR?", o: ["Não, é invasão de privacidade", "Sim, o contrato prevê autorização para consulta e fornecimento de dados", "Apenas se o cliente for empresário", "Somente via processo judicial"], c: 1, why: "A consulta ao SCR é padrão bancário para análise de risco de crédito." },
+        { t: "Disposições Gerais e Canais", q: "Qual o número da Ouvidoria do PagSeguro?", o: ["0800-728-2167", "190", "0800-000-0000", "4004-0001"], c: 0, why: "A Ouvidoria é o canal de última instância para reclamações não resolvidas." },
+        { t: "Disposições Gerais e Canais", q: "A 'tolerância' do PagSeguro em um atraso significa perdão da dívida?", o: ["Sim, vira regra", "Não, é mera liberalidade e não altera o contrato", "Sim, gera desconto automático", "O contrato é anulado"], c: 1, why: "Se o banco não cobrar hoje, ele não perde o direito de cobrar amanhã conforme as regras." },
+        { t: "Disposições Gerais e Canais", q: "O que integra o contrato além do texto principal?", o: ["Apenas as leis federais", "Proposta de adesão, comunicações enviadas e informações na FATURA", "Apenas o manual de instruções", "Nada mais"], c: 1, why: "Toda comunicação oficial enviada ao cliente passa a fazer parte do conjunto de regras." },
+        { t: "Disposições Gerais e Canais", q: "Onde este contrato está registrado oficialmente?", o: ["Na Prefeitura de São Paulo", "5º Cartório de Registro de Títulos e Documentos da Comarca de São Paulo", "No site da Visa", "Não possui registro"], c: 1, why: "O registro em cartório garante a publicidade e validade jurídica do documento." },
+        { t: "Disposições Gerais e Canais", q: "O que o cliente deve fazer se não estiver satisfeito com o atendimento via Chat/App?", o: ["Recorrer à Ouvidoria ou Central de Atendimento", "Parar de pagar o cartão", "Mudar de país", "Ligar para a polícia"], c: 0, why: "O contrato lista uma hierarquia de canais: central, chat, ajuda e por fim a ouvidoria." }
+        
+    ];
+
+    let filtradas = [];
+    let indiceAtual = 0;
+    let acertos = 0;
+
+    function iniciarQuiz(tema) {
+        if (tema === 'Tudo') {
+            filtradas = [...bancoDeDados].sort(() => Math.random() - 0.5);
+        } else {
+            filtradas = bancoDeDados.filter(p => p.t === tema);
+        }
+
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'block';
+        
+        indiceAtual = 0;
+        acertos = 0;
+        mostrarPergunta();
+    }
+
+    function mostrarPergunta() {
+        const p = filtradas[indiceAtual];
+        document.getElementById('topic-label').innerText = p.t;
+        document.getElementById('status').innerText = `Questão ${indiceAtual + 1} de ${filtradas.length}`;
+        document.getElementById('question').innerText = p.q;
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        
+        const perc = (indiceAtual / filtradas.length) * 100;
+        document.getElementById('progress-fill').style.width = perc + '%';
+
+        const containerOpcoes = document.getElementById('options');
+        containerOpcoes.innerHTML = '';
+
+        p.o.forEach((texto, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = texto;
+            btn.onclick = () => {
+                const botoes = document.querySelectorAll('.option-btn');
+                botoes.forEach(b => b.disabled = true);
+                
+                if(i === p.c) {
+                    btn.classList.add('correct');
+                    acertos++;
+                    setTimeout(proximaPergunta, 1200);
+                } else {
+                    btn.classList.add('wrong');
+                    botoes[p.c].classList.add('correct');
+                    document.getElementById('explanation').innerHTML = `<b>O que diz o contrato:</b> ${p.why}`;
+                    document.getElementById('explanation').style.display = 'block';
+                    document.getElementById('next-btn').style.display = 'block';
+                }
+            };
+            containerOpcoes.appendChild(btn);
+        });
+    }
+
+    function proximaPergunta() {
+        indiceAtual++;
+        if(indiceAtual < filtradas.length) {
+            mostrarPergunta();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            document.getElementById('quiz-area').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('score-circle').innerText = acertos;
+            document.getElementById('summary').innerText = `Você concluiu o tópico com ${acertos} acertos de um total de ${filtradas.length} questões.`;
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Simulado Contrato PagBank",
+  "short_name": "QuizPagBank",
+  "description": "Treinamento completo sobre o contrato do cartão PagBank",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2ecc71",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3407/3407024.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
